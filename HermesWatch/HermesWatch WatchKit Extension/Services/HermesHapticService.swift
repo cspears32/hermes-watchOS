@@ -14,6 +14,7 @@ enum HapticPattern {
     case heartbeat     // Subtle tick
     case success       // Strong positive feedback
     case error         // Error buzz pattern
+    case actionRequired // Urgent: approve/reject needed
     
     var impactStyle: UIImpactFeedbackGenerator.FeedbackStyle {
         switch self {
@@ -24,6 +25,7 @@ enum HapticPattern {
         case .heartbeat: return .light
         case .success: return .heavy
         case .error: return .heavy
+        case .actionRequired: return .heavy
         }
     }
     
@@ -32,6 +34,7 @@ enum HapticPattern {
         case .approval, .success: return .success
         case .denial, .error: return .warning
         case .taskReceived, .notification, .heartbeat: return .success
+        case .actionRequired: return .warning
         }
     }
 }
@@ -41,10 +44,12 @@ class HermesHapticService {
     
     private var impactGenerator: UIImpactFeedbackGenerator?
     private var notificationGenerator: UINotificationFeedbackGenerator?
+    private var selectionGenerator: UISelectionFeedbackGenerator?
     
     private init() {
         impactGenerator = UIImpactFeedbackGenerator(style: .medium)
         notificationGenerator = UINotificationFeedbackGenerator()
+        selectionGenerator = UISelectionFeedbackGenerator()
     }
     
     func play(_ pattern: HapticPattern) {
@@ -72,6 +77,12 @@ class HermesHapticService {
         case .notification, .heartbeat:
             // Subtle light feedback
             playImpact(.light)
+            
+        case .actionRequired:
+            // Urgent pattern: heavy impact + warning + selection tick
+            playImpact(.heavy)
+            playNotification(.warning)
+            playSelection()
         }
     }
     
@@ -83,5 +94,10 @@ class HermesHapticService {
     private func playNotification(_ type: UINotificationFeedbackGenerator.FeedbackType) {
         notificationGenerator?.prepare()
         notificationGenerator?.notificationOccurred(type)
+    }
+    
+    private func playSelection() {
+        selectionGenerator?.prepare()
+        selectionGenerator?.selectionChanged()
     }
 }

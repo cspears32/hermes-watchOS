@@ -145,7 +145,8 @@ class HermesSessionService: ObservableObject {
             case .taskNew(let task):
                 if !pendingTasks.contains(where: { $0.id == task.id }) {
                     pendingTasks.append(task)
-                    HermesHapticService.shared.play(.taskReceived)
+                    // Play urgent haptic pattern for action-required tasks
+                    HermesHapticService.shared.play(.actionRequired)
                 }
                 // Update active session if it has pending tasks
                 if var session = activeSession {
