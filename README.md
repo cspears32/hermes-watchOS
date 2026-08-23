@@ -1,145 +1,112 @@
 # Hermes WatchOS
 
-A companion app for [Hermes Agent](https://hermes-agent.nousresearch.com) that runs on Apple Watch (watchOS). Provides quick access to task approvals, status monitoring, and petdex animations from your wrist.
+Apple Watch companion app for [Hermes Agent](https://hermes-agent.nousresearch.com).
 
-## Features
+## Design
 
-- **Task Queue** — View pending Hermes tasks with approve/deny actions
-- **Petdex Viewer** — Watch Hermes pet animations on your watch
-- **Quick Responses** — Swipe to send canned replies
-- **Status Screen** — Hermes heartbeat, connected devices, queue depth
-- **Haptic Feedback** — Custom patterns for approvals, denials, notifications
+**Voice input, status output interface.** Three full-screen modes cycled by rotating the Digital Crown:
+
+1. **Pet/Face** — Hermes digital pet with breathing animation + current session name
+2. **Session** — Color-coded session status:
+   - 🟢 Green background = done / idle
+   - 🔴 Red background = needs approval (shows approve/deny buttons)
+   - 🔵 Blue background = working / in progress
+3. **Profile** — Scrollable list of Hermes profiles; rotate crown to scroll, press crown to select
+
+### Input
+
+- **Primary:** Voice input (top-right mic button, always available)
+- **Secondary:** Digital Crown (scroll modes, scroll profiles, select by pressing)
+- **Tertiary:** Tap screen (peek at session info on pet face)
+
+### Output
+
+- Full-screen color-coded backgrounds
+- Haptic feedback via Taptic Engine (approval buzz, denial tap, notification pulse)
+- Digital pet animation (breathing, mood changes)
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│           Apple Watch (watchOS)          │
-│                                          │
-│  ┌──────────┐  ┌────────────────────┐   │
-│  │ SwiftUI  │  │ Hermes Watch App   │   │
-│  │ UI Layer │  │ - Approve/Deny UI  │   │
-│  │ - Petdex │  │ - Notification UI  │   │
-│  │ - Status │  │ - Quick responses  │   │
-│  └────┬─────┘  └────────┬───────────┘   │
-│       │                 │               │
-│  ┌────▼─────────────────▼───────────┐   │
-│  │        WebSocket Client          │   │
-│  │  (connects to Hermes Gateway)    │   │
-│  └────────────────┬─────────────────┘   │
-│                   │                     │
-│  ┌────────────────▼─────────────────┐   │
-│  │     Taptic Engine (Haptics)      │   │
-│  │     Haptic feedback patterns     │   │
-│  └──────────────────────────────────┘   │
-└─────────────────────────────────────────┘
-                │ WiFi / BLE
-                ▼
-┌─────────────────────────────────────────┐
-│           Hermes Gateway (9377)          │
-│  WebSocket endpoint for device events   │
-└─────────────────────────────────────────┘
-```
-
-## Getting Started
-
-### Requirements
-
-- macOS 14+ (Sonoma) with Xcode 15+
-- An Apple Watch (Series 4 or later recommended)
-- Paired iPhone running iOS 17+
-- Hermes Agent running locally with WebSocket support
-
-### Setup
-
-1. Open `HermesWatch.xcodeproj` in Xcode
-2. Set your development team (signing) in project settings
-3. Update the WebSocket endpoint URL in `HermesWebSocketService.swift`
-4. Build and run on your Apple Watch
-
-### Configuration
-
-Edit `Config.swift` to set:
-
-```swift
-struct Config {
-    static let gatewayURL = "ws://localhost:9377"
-    static let heartbeatInterval: TimeInterval = 30
-    static let reconnectDelay: TimeInterval = 5
-}
+┌─────────────────────────────────────┐
+│         Apple Watch (watchOS)        │
+│                                      │
+│  ┌─────────┐  ┌──────────────────┐  │
+│  │ Voice   │  │ Digital Crown    │  │
+│  │ Input   │  │ (cycle modes)    │  │
+│  │         │  │ (press = confirm)│  │
+│  └────┬────┘  └────────┬─────────┘  │
+│       │                 │            │
+│  ┌────▼─────────────────▼──────────┐│
+│  │       WebSocket Client          ││
+│  │  ws://localhost:9377/ws/hermes  ││
+│  └────────────────┬────────────────┘│
+│                   │                  │
+│  ┌────────────────▼────────────────┐│
+│  │   Taptic Engine (Haptics)      ││
+│  └─────────────────────────────────┘│
+└─────────────────────┬───────────────┘
+                      │ WiFi
+                      ▼
+┌─────────────────────────────────────┐
+│       Hermes Gateway (9377)         │
+│  WebSocket endpoint for watch events│
+└─────────────────────────────────────┘
 ```
 
 ## Project Structure
 
 ```
 HermesWatch/
-├── HermesWatch Watch App/          # WatchOS app (main entry point)
-│   ├── HermesWatchApp.swift        # App entry point
-│   └── ContentView.swift           # Root view
-├── HermesWatch WatchKit Extension/ # Extension with logic
-│   ├── HermesWebSocketService.swift  # WebSocket client
-│   ├── HermesTaskService.swift       # Task management
-│   ├── HermesHapticService.swift     # Haptic feedback
-│   └── HermesModels.swift            # Data models
-├── HermesWatch WatchExtension/       # Glance/Complication
-└── HermesWatch WatchApp/             # Standalone watch app (if needed)
+├── HermesWatch Watch App/
+│   ├── HermesWatchApp.swift      # Main entry point
+│   └── Info.plist
+└── HermesWatch WatchKit Extension/
+    ├── ExtensionDelegate.swift
+    ├── Models/
+    │   ├── HermesModels.swift     # Task, Session, Profile, WebSocket events
+    │   └── Config.swift
+    ├── Services/
+    │   ├── HermesWebSocketService.swift  # WebSocket client
+    │   ├── HermesSessionService.swift    # Session state management
+    │   ├── HermesProfileService.swift    # Profile selection/activation
+    │   ├── HermesVoiceService.swift      # SFSpeechRecognizer voice input
+    │   └── HermesHapticService.swift     # Taptic Engine wrapper
+    └── Views/
+        ├── MainScreenView.swift    # Mode router (pet/session/profile)
+        ├── PetFaceView.swift       # Digital pet with breathing animation
+        ├── SessionView.swift       # Color-coded session status
+        └── ProfileView.swift       # Profile selector
 ```
 
-## Hermes Gateway Integration
+## Setup
 
-The watch connects to Hermes via WebSocket. Expected endpoints:
+1. Open `HermesWatch.xcodeproj` in Xcode
+2. Set your bundle identifier and signing team
+3. Update `Config.gatewayURL` to your Hermes Gateway address
+4. Build and run on your Apple Watch
 
-```
-ws://<gateway-host>:9377/ws/hermes/watch
-```
+## WebSocket Protocol
 
-### Events
-
-- **`task:new`** — New task received
-- **`task:updated`** — Task status changed
-- **`task:completed`** — Task finished
-- **`hermes:heartbeat`** — Gateway health check
-- **`hermes:status`** — System status update
-
-### Actions
-
-The watch sends:
+### Messages from Watch → Gateway
 
 ```json
-{
-  "type": "task:approve",
-  "taskId": "task-123"
-}
+{ "type": "task:approve", "payload": "<task_id>" }
+{ "type": "task:deny", "payload": "<task_id>", "reason": "<optional>" }
+{ "type": "profile:activate", "payload": "<profile_id>" }
+{ "type": "voice:command", "payload": "<transcribed_text>" }
+{ "type": "hermes:heartbeat" }
 ```
+
+### Messages from Gateway → Watch
 
 ```json
-{
-  "type": "task:deny",
-  "taskId": "task-123",
-  "reason": "User declined"
-}
+{ "type": "task:new", ... }
+{ "type": "task:updated", ... }
+{ "type": "task:completed", "payload": "<task_id>" }
+{ "type": "hermes:heartbeat", ... }
+{ "type": "hermes:status", ... }
 ```
-
-## Development
-
-### Building
-
-```bash
-# Open in Xcode
-open HermesWatch.xcodeproj
-
-# Or build from command line
-xcodebuild -project HermesWatch.xcodeproj \
-  -scheme HermesWatch\ Watch\ App \
-  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm),OS=latest' \
-  build
-```
-
-### Testing
-
-- Use Apple Watch Simulator for UI testing
-- Test WebSocket connections with a local Hermes instance
-- Verify haptic feedback on real device
 
 ## License
 

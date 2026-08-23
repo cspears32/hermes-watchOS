@@ -1,13 +1,30 @@
 // HermesModels.swift
 //
 // Core data models for Hermes WatchOS integration.
-// Defines the types used for tasks, status, and communication.
 
 import Foundation
 
-// MARK: - Task Models
+// MARK: - Session
 
-struct HermesTask: Identifiable, Codable, Hashable, Sendable {
+struct HermesSession: Identifiable, Codable, Hashable {
+    let id: String
+    let name: String
+    let status: SessionStatus
+    let profile: String?
+    let startedAt: Date?
+    let completedAt: Date?
+}
+
+enum SessionStatus: String, Codable, Hashable {
+    case idle
+    case working
+    case needsApproval = "needs_approval"
+    case done
+}
+
+// MARK: - Task
+
+struct HermesTask: Identifiable, Codable, Hashable {
     let id: String
     let title: String
     let description: String
@@ -47,7 +64,6 @@ struct HermesTask: Identifiable, Codable, Hashable, Sendable {
         self.metadata = metadata
     }
     
-    // Short title for watch display
     var shortTitle: String {
         let maxChars = 30
         if title.count > maxChars {
@@ -55,23 +71,9 @@ struct HermesTask: Identifiable, Codable, Hashable, Sendable {
         }
         return title
     }
-    
-    var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: createdAt)
-    }
-    
-    var timeAgo: String {
-        let interval = Date().timeIntervalSince(createdAt)
-        if interval < 60 { return "just now" }
-        if interval < 3600 { return "\(Int(interval / 60))m ago" }
-        if interval < 86400 { return "\(Int(interval / 3600))h ago" }
-        return "\(Int(interval / 86400))d ago"
-    }
 }
 
-enum TaskStatus: String, Codable, CaseIterable, Sendable {
+enum TaskStatus: String, Codable, Hashable {
     case pending = "pending"
     case approved = "approved"
     case denied = "denied"
@@ -79,97 +81,33 @@ enum TaskStatus: String, Codable, CaseIterable, Sendable {
     case completed = "completed"
 }
 
-enum TaskPriority: String, Codable, CaseIterable, Sendable {
+enum TaskPriority: String, Codable, Hashable {
     case low = "low"
     case normal = "normal"
     case high = "high"
     case critical = "critical"
 }
 
-// MARK: - Status Models
+// MARK: - Profile
 
-struct HermesStatus: Codable, Sendable {
-    let tasksPending: Int
-    let tasksCompleted: Int
-    let tasksFailed: Int
-    let uptime: TimeInterval
-    let version: String
-    let connectedDevices: Int
-}
-
-struct HeartbeatResponse: Codable, Sendable {
-    let status: String
-    let uptime: TimeInterval
-    let connectedDevices: Int
-}
-
-// MARK: - Watch Message Types
-
-enum HermesWatchMessage: Codable, Sendable {
-    case taskApprove(String)
-    case taskDeny(String, String)
-    case heartbeat
-    case statusRequest
-    
-    enum MessageType: String, Codable, Sendable {
-        case taskApprove = "task:approve"
-        case taskDeny = "task:deny"
-        case heartbeat = "hermes:heartbeat"
-        case statusRequest = "hermes:status"
-    }
-    
-    var type: MessageType {
-        switch self {
-        case .taskApprove: return .taskApprove
-        case .taskDeny: return .taskDeny
-        case .heartbeat: return .heartbeat
-        case .statusRequest: return .statusRequest
-        }
-    }
-    
-    var taskId: String? {
-        switch self {
-        case .taskApprove(let id): return id
-        case .taskDeny(let id, _): return id
-        case .heartbeat, .statusRequest: return nil
-        }
-    }
-    
-    var reason: String? {
-        switch self {
-        case .taskDeny(_, let reason): return reason
-        default: return nil
-        }
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case type
-        case taskId
-        case reason
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(type, forKey: .type)
-        if let taskId = taskId {
-            try container.encode(taskId, forKey: .taskId)
-        }
-        if let reason = reason {
-            try container.encode(reason, forKey: .reason)
-        }
-    }
+struct HermesProfile: Identifiable, Codable, Hashable {
+    let id: String
+    let name: String
+    let description: String
+    let isActive: Bool
+    let settings: [String: String]?
 }
 
 // MARK: - WebSocket Events
 
-enum HermesWebSocketEvent: Codable, Sendable {
+enum HermesWebSocketEvent: Codable {
     case taskNew(HermesTask)
     case taskUpdated(HermesTask)
     case taskCompleted(String)
     case hermesHeartbeat(HeartbeatResponse)
-    case hermesStatus(HermesStatus)
+    case hermesStatus(StatusResponse)
     
-    enum EventType: String, Codable, Sendable {
+    enum EventType: String, Codable {
         case taskNew = "task:new"
         case taskUpdated = "task:updated"
         case taskCompleted = "task:completed"
@@ -187,17 +125,93 @@ enum HermesWebSocketEvent: Codable, Sendable {
         case .taskUpdated:
             self = try .taskUpdated(HermesTask(from: decoder))
         case .taskCompleted:
-            let singleContainer = try decoder.singleValueContainer()
-            let decoded = try singleContainer.decode([String: String].self)
+            let single = try decoder.singleValueContainer()
+            let decoded = try single.decode([String: String].self)
             self = .taskCompleted(decoded["taskId"] ?? "")
         case .hermesHeartbeat:
             self = try .hermesHeartbeat(HeartbeatResponse(from: decoder))
         case .hermesStatus:
-            self = try .hermesStatus(HermesStatus(from: decoder))
+            self = try .hermesStatus(StatusResponse(from: decoder))
         }
     }
     
     enum CodingKeys: String, CodingKey {
         case type
+    }
+}
+
+struct HeartbeatResponse: Codable {
+    let status: String
+    let uptime: TimeInterval
+    let connectedDevices: Int
+}
+
+struct StatusResponse: Codable {
+    let tasksPending: Int
+    let tasksCompleted: Int
+    let tasksFailed: Int
+    let uptime: TimeInterval
+    let version: String
+}
+
+// MARK: - Watch Messages
+
+enum HermesWatchMessage: Codable {
+    case taskApprove(String)
+    case taskDeny(String, String)
+    case heartbeat
+    case profileActivate(String)
+    case voiceCommand(String)
+    
+    enum MessageType: String, Codable {
+        case taskApprove = "task:approve"
+        case taskDeny = "task:deny"
+        case heartbeat = "hermes:heartbeat"
+        case profileActivate = "profile:activate"
+        case voiceCommand = "voice:command"
+    }
+    
+    var type: MessageType {
+        switch self {
+        case .taskApprove: return .taskApprove
+        case .taskDeny: return .taskDeny
+        case .heartbeat: return .heartbeat
+        case .profileActivate: return .profileActivate
+        case .voiceCommand: return .voiceCommand
+        }
+    }
+    
+    var payload: String? {
+        switch self {
+        case .taskApprove(let id): return id
+        case .taskDeny(let id, _): return id
+        case .profileActivate(let id): return id
+        case .voiceCommand(let cmd): return cmd
+        case .heartbeat: return nil
+        }
+    }
+    
+    var reason: String? {
+        switch self {
+        case .taskDeny(_, let reason): return reason
+        default: return nil
+        }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case type
+        case payload
+        case reason
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        if let payload = payload {
+            try container.encode(payload, forKey: .payload)
+        }
+        if let reason = reason {
+            try container.encode(reason, forKey: .reason)
+        }
     }
 }
