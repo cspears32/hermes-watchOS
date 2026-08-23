@@ -1,0 +1,46 @@
+// Xcode 15.0 Xcode Project
+// HermesWatch
+
+objc.enableBridging = false
+attributesBuildProductVersion = "version3.0"
+buildActionBuildDependents = true
+buildActionBuildRecipes = (
+);
+bundleIdentifierPrefix = "com.example";
+compatibilityVersion = "Xcode 14.0";
+compatibilityVersionForTypeSystem = 9968;
+crossPlatformApplication = true;
+currentProjectName = "HermesWatch";
+developmentRegion = "en";
+detectAll_dependencies = true;
+generatedObjetiveCInjectCategories = false;
+hasScannedForEncodings = 0;
+knownObjectIDs = (
+	07C3192C2570D850006E541D /* Objects */ /* PBXFilesGroup */,
+	07C3192D2570D850006E541D /* HermesWatch */ /* PBXNativeTarget */,
+	07C3192E2570D850006E541D /* 10591B802860966800830B23 /* HermesWatch Watch App */ /* PBXTargetDependency */,
+	07C3192F2570D850006E541D /* 10591B812860966800830B23 /* HermesWatch WatchKit Extension */ /* PBXTargetDependency */,
+	07C319302570D851006E541D /* HermesWatch Watch App */ /* PBXGroup */,
+	07C319312570D851006E541D /* HermesWatch WatchKit Extension */ /* PBXGroup */,
+	07C319322570D851006E541D /* Products */ /* PBXGroup */,
+	07C319332570D851006E541D /* Frameworks */ /* PBXGroup */,
+	07C319342570D851006E541D /* HermesWatch Watch App */ /* PBXTarget */,
+	07C319352570D851006E541D /* HermesWatch WatchKit Extension */ /* PBXTarget */,
+);
+mainGroup = "07C3192C2570D850006E541D /* Objects */ /* PBXFilesGroup */;
+projectRoot = "";
+targets = (
+	07C3192D2570D850006E541D /* HermesWatch */ /* PBXNativeTarget */,
+);
+attributes = {
+	LastSwiftUpdateCheck = 1500;
+	LastUpgradeCheck = 1500;
+	TargetAttributes = {
+		10591B802860966800830B23 = {
+			CreatedOnToolsVersion = 15.0;
+		};
+		10591B812860966800830B23 = {
+			CreatedOnToolsVersion = 15.0;
+		};
+	};
+};
