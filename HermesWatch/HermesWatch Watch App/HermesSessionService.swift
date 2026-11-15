@@ -2,117 +2,112 @@
 //
 // Manages Hermes sessions: connects to gateway, monitors session state,
 // and provides approve/deny actions.
-//
-// Session states:
-//   - idle: Hermes is waiting
-//   - working: Hermes is processing
-//   - needsApproval: needs user decision (shows red screen)
-//   - done: all tasks completed (shows green screen)
 
 import Foundation
 import Combine
-
-enum SessionStatus: String, Codable {
-    case idle
-    case working
-    case needsApproval = "needs_approval"
-    case done
-}
 
 class HermesSessionService: ObservableObject {
     @Published var activeSession: HermesSession?
     @Published var pendingTasks: [HermesTask] = []
     @Published var isConnected = false
     @Published var lastError: String?
-    
+
     private var websocket: URLSessionWebSocketTask?
     private var session: URLSession?
     private var reconnectTimer: Timer?
     private var heartbeatTimer: Timer?
-    
+    private var isListening = false
+
     private let url: URL
-    
+
     init(url: URL = URL(string: Config.gatewayURL + "/ws/hermes/watch")!) {
         self.url = url
     }
-    
+
     func connect() {
+        guard websocket == nil else { return }
+
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
-        
+
         session = URLSession(configuration: config)
         websocket = session?.webSocketTask(with: url)
         websocket?.resume()
-        
+
         isConnected = true
         startHeartbeat()
         listenForMessages()
     }
-    
+
     func disconnect() {
         reconnectTimer?.invalidate()
         heartbeatTimer?.invalidate()
         websocket?.cancel(with: .normalClosure, reason: nil)
+        websocket = nil
+        isConnected = false
+        isListening = false
     }
-    
+
     func approveTask(_ task: HermesTask) {
         guard isConnected else { return }
-        
-        let message = HermesWatchMessage.taskApprove(task.id)
-        sendMessage(message)
+
+        sendMessage(.taskApprove(task.id))
         HermesHapticService.shared.play(.approval)
-        
-        // Optimistic update
-        if let index = pendingTasks.firstIndex(where: { $0.id == task.id }) {
-            pendingTasks.remove(at: index)
-        }
+
+        pendingTasks.removeAll { $0.id == task.id }
     }
-    
+
+    func sendVoiceCommand(_ command: String) {
+        sendMessage(.voiceCommand(command))
+    }
+
     func denyTask(_ task: HermesTask) {
         guard isConnected else { return }
-        
-        let message = HermesWatchMessage.taskDeny(task.id, "")
-        sendMessage(message)
+
+        sendMessage(HermesWatchMessage.taskDeny(task.id, ""))
         HermesHapticService.shared.play(.denial)
-        
-        if let index = pendingTasks.firstIndex(where: { $0.id == task.id }) {
-            pendingTasks.remove(at: index)
-        }
+
+        pendingTasks.removeAll { $0.id == task.id }
     }
-    
+
     private func sendMessage(_ message: HermesWatchMessage) {
         guard let task = websocket else { return }
-        
+
         do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(message)
-            task.send(data) { _ in }
+            guard let json = String(data: try JSONEncoder().encode(message), encoding: .utf8) else { return }
+            task.send(.string(json)) { [weak self] error in
+                if let error = error {
+                    self?.lastError = error.localizedDescription
+                }
+            }
         } catch {
-            print("Failed to send: \(error)")
             lastError = error.localizedDescription
         }
     }
-    
+
     private func startHeartbeat() {
         heartbeatTimer?.invalidate()
         heartbeatTimer = Timer.scheduledTimer(withTimeInterval: Config.heartbeatInterval, repeats: true) { [weak self] _ in
             self?.sendMessage(.heartbeat)
         }
     }
-    
+
     private func attemptReconnect() {
+        websocket = nil
         reconnectTimer?.invalidate()
         reconnectTimer = Timer.scheduledTimer(withTimeInterval: Config.reconnectDelay, repeats: false) { [weak self] _ in
             self?.connect()
         }
     }
-    
+
     private func listenForMessages() {
-        guard let task = websocket else { return }
-        
+        guard let task = websocket, !isListening else { return }
+        isListening = true
+
         task.receive { [weak self] result in
             guard let self = self else { return }
-            
+            self.isListening = false
+
             switch result {
             case .success(let message):
                 self.handleMessage(message)
@@ -124,7 +119,7 @@ class HermesSessionService: ObservableObject {
             }
         }
     }
-    
+
     private func handleMessage(_ message: URLSessionWebSocketTask.Message) {
         switch message {
         case .data(let data):
@@ -136,22 +131,22 @@ class HermesSessionService: ObservableObject {
         @unknown default: break
         }
     }
-    
+
     private func handleData(_ data: Data) {
         do {
-            // Try as WebSocket event
             let event = try JSONDecoder().decode(HermesWebSocketEvent.self, from: data)
             switch event {
             case .taskNew(let task):
                 if !pendingTasks.contains(where: { $0.id == task.id }) {
                     pendingTasks.append(task)
-                    // Play urgent haptic pattern for action-required tasks
                     HermesHapticService.shared.play(.actionRequired)
                 }
-                // Update active session if it has pending tasks
                 if var session = activeSession {
                     session.status = .needsApproval
                     activeSession = session
+                } else {
+                    activeSession = HermesSession(id: "live", name: "Hermes", status: .needsApproval,
+                                                  profile: nil, startedAt: Date(), completedAt: nil)
                 }
             case .taskUpdated(let task):
                 if let index = pendingTasks.firstIndex(where: { $0.id == task.id }) {
@@ -164,13 +159,15 @@ class HermesSessionService: ObservableObject {
                     activeSession = session
                 }
             case .hermesStatus(let status):
-                // Could update session from status
-                break
+                var session = activeSession ?? HermesSession(id: "live", name: "Hermes", status: .idle,
+                                                             profile: nil, startedAt: Date(), completedAt: nil)
+                session.status = status.tasksPending > 0 ? .working : .done
+                activeSession = session
             case .hermesHeartbeat:
                 break
             }
         } catch {
-            print("WebSocket decode error: \(error)")
+            lastError = "WebSocket decode error: \(error)"
         }
     }
 }
