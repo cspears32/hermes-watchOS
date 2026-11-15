@@ -1,24 +1,27 @@
 // TaskQueueView.swift
 //
-// Displays pending Hermes tasks with approve/deny actions.
-// Optimized for the small round watch display.
+// Pending Hermes tasks with approve/deny actions.
 
 import SwiftUI
 
 struct TaskQueueView: View {
     @EnvironmentObject var taskService: HermesTaskService
     @Environment(\.scenePhase) private var scenePhase
-    
+
+    @State private var showingDenyAlert = false
+    @State private var selectedTask: HermesTask?
+    @State private var denyReason = ""
+
     var body: some View {
         Group {
             if taskService.isProcessing {
                 ProgressView("Processing...")
-            } else if taskService.pendingTasks.isEmpty {
+            } else if taskService.tasks.isEmpty {
                 EmptyStateView()
             } else {
                 ScrollView {
                     LazyVStack(spacing: 8) {
-                        ForEach(taskService.pendingTasks) { task in
+                        ForEach(taskService.tasks) { task in
                             TaskCardView(task: task)
                                 .onTapGesture {
                                     taskService.approveTask(task)
@@ -34,9 +37,6 @@ struct TaskQueueView: View {
                         }
                     }
                     .padding(.horizontal)
-                }
-                .refreshable {
-                    taskService.refreshTasks()
                 }
             }
         }
@@ -57,15 +57,7 @@ struct TaskQueueView: View {
             Text("Why are you denying this?")
         }
     }
-    
-    private var showEmptyState: Bool {
-        !taskService.isProcessing && taskService.pendingTasks.isEmpty
-    }
-    
-    @State private var showingDenyAlert = false
-    @State private var selectedTask: HermesTask?
-    @State private var denyReason = ""
-    
+
     private func showDenyAlert(for task: HermesTask) {
         selectedTask = task
         showingDenyAlert = true
@@ -77,10 +69,9 @@ struct TaskQueueView: View {
 struct TaskCardView: View {
     let task: HermesTask
     @Environment(\.colorScheme) private var colorScheme
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            // Priority indicator
             HStack {
                 priorityDot
                 Text(task.shortTitle)
@@ -88,14 +79,13 @@ struct TaskCardView: View {
                     .lineLimit(2)
                     .foregroundColor(.primary)
                 Spacer()
-                Text(task.timeAgo)
+                Text(task.createdAt, style: .relative)
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
-            
-            // Description preview
+
             if task.description.count > 40 {
-                Text(task.description.prefix(40) + "...")
+                Text(String(task.description.prefix(40)) + "...")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .lineLimit(2)
@@ -104,16 +94,16 @@ struct TaskCardView: View {
         .padding(8)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(colorScheme == .dark ? Color(.systemGray5) : Color(.systemGray6))
+                .fill(colorScheme == .dark ? Color.gray.opacity(0.3) : Color.gray.opacity(0.15))
         )
     }
-    
+
     private var priorityDot: some View {
         Circle()
             .fill(priorityColor)
             .frame(width: 6, height: 6)
     }
-    
+
     private var priorityColor: Color {
         switch task.priority {
         case .low: return .green
@@ -132,23 +122,13 @@ struct EmptyStateView: View {
             Image(systemName: "checkmark.circle")
                 .font(.system(size: 40))
                 .foregroundColor(.green)
-            
+
             Text("All caught up!")
                 .font(.system(size: 16, weight: .semibold))
-            
+
             Text("No pending tasks")
                 .font(.system(size: 12))
                 .foregroundColor(.secondary)
         }
-    }
-}
-
-// MARK: - Preview
-
-struct TaskQueueView_Previews: PreviewProvider {
-    static var previews: some View {
-        TaskQueueView()
-            .environmentObject(HermesTaskService())
-            .previewDisplayName("Task Queue")
     }
 }

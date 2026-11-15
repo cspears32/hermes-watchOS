@@ -1,12 +1,6 @@
 // MainScreenView.swift
 //
-// Single full-screen view that switches between 3 modes via crown rotation:
-//   0 = Pet/Face
-//   1 = Session
-//   2 = Profile
-//
-// Crown rotation cycles modes; crown press confirms selections.
-// Voice input is always available (top-right mic button).
+// Full-screen switch between Pet / Session / Profile via crown rotation.
 
 import SwiftUI
 
@@ -14,10 +8,10 @@ struct MainScreenView: View {
     @EnvironmentObject var sessionService: HermesSessionService
     @EnvironmentObject var profileService: HermesProfileService
     @EnvironmentObject var voiceService: HermesVoiceService
-    
+    @EnvironmentObject var taskService: HermesTaskService
+
     @State private var currentMode: ScreenMode = .pet
-    @State private var profileScrollOffset: CGFloat = 0
-    
+
     var body: some View {
         ZStack {
             switch currentMode {
@@ -31,30 +25,45 @@ struct MainScreenView: View {
         }
         .ignoresSafeArea()
         .overlay(alignment: .topTrailing) {
-            // Voice input button always available
             VoiceButton()
                 .padding()
         }
+        .focusable()
+        .digitalCrownRotation(
+            detent: $crownDetent,
+            from: 0, through: 2, by: 1,
+            sensitivity: .medium,
+            isContinuous: false,
+            isHapticFeedbackEnabled: true
+        )
+        .onChange(of: crownDetent) { _, newValue in
+            currentMode = ScreenMode(rawValue: Int(newValue.rounded())) ?? .pet
+        }
         .onAppear {
+            voiceService.onCommand = { command in
+                sessionService.sendVoiceCommand(command)
+            }
             sessionService.connect()
             profileService.connect()
         }
     }
+
+    @State private var crownDetent: Double = 0
 }
 
 // MARK: - Screen Modes
 
-enum ScreenMode {
-    case pet
-    case session
-    case profile
+enum ScreenMode: Int {
+    case pet = 0
+    case session = 1
+    case profile = 2
 }
 
 // MARK: - Voice Button
 
 struct VoiceButton: View {
     @EnvironmentObject var voiceService: HermesVoiceService
-    
+
     var body: some View {
         Button(action: {
             if voiceService.isListening {
@@ -67,7 +76,7 @@ struct VoiceButton: View {
                 .fill(voiceService.isListening ? Color.red : Color.blue.opacity(0.7))
                 .frame(width: 40, height: 40)
                 .overlay {
-                    Image(systemName: voiceService.isListening ? "mic.fill" : "mic.fill")
+                    Image(systemName: "mic.fill")
                         .foregroundColor(.white)
                         .font(.system(size: 16))
                 }

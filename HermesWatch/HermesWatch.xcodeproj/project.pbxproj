@@ -1,46 +1,152 @@
-// Xcode 15.0 Xcode Project
-// HermesWatch
-
-objc.enableBridging = false
-attributesBuildProductVersion = "version3.0"
-buildActionBuildDependents = true
-buildActionBuildRecipes = (
-);
-bundleIdentifierPrefix = "com.example";
-compatibilityVersion = "Xcode 14.0";
-compatibilityVersionForTypeSystem = 9968;
-crossPlatformApplication = true;
-currentProjectName = "HermesWatch";
-developmentRegion = "en";
-detectAll_dependencies = true;
-generatedObjetiveCInjectCategories = false;
-hasScannedForEncodings = 0;
-knownObjectIDs = (
-	07C3192C2570D850006E541D /* Objects */ /* PBXFilesGroup */,
-	07C3192D2570D850006E541D /* HermesWatch */ /* PBXNativeTarget */,
-	07C3192E2570D850006E541D /* 10591B802860966800830B23 /* HermesWatch Watch App */ /* PBXTargetDependency */,
-	07C3192F2570D850006E541D /* 10591B812860966800830B23 /* HermesWatch WatchKit Extension */ /* PBXTargetDependency */,
-	07C319302570D851006E541D /* HermesWatch Watch App */ /* PBXGroup */,
-	07C319312570D851006E541D /* HermesWatch WatchKit Extension */ /* PBXGroup */,
-	07C319322570D851006E541D /* Products */ /* PBXGroup */,
-	07C319332570D851006E541D /* Frameworks */ /* PBXGroup */,
-	07C319342570D851006E541D /* HermesWatch Watch App */ /* PBXTarget */,
-	07C319352570D851006E541D /* HermesWatch WatchKit Extension */ /* PBXTarget */,
-);
-mainGroup = "07C3192C2570D850006E541D /* Objects */ /* PBXFilesGroup */;
-projectRoot = "";
-targets = (
-	07C3192D2570D850006E541D /* HermesWatch */ /* PBXNativeTarget */,
-);
-attributes = {
-	LastSwiftUpdateCheck = 1500;
-	LastUpgradeCheck = 1500;
-	TargetAttributes = {
-		10591B802860966800830B23 = {
-			CreatedOnToolsVersion = 15.0;
-		};
-		10591B812860966800830B23 = {
-			CreatedOnToolsVersion = 15.0;
-		};
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
 	};
-};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BF000001 /* HermesWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000001 /* HermesWatchApp.swift */; };
+		BF000002 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000002 /* ExtensionDelegate.swift */; };
+		BF000003 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000003 /* Config.swift */; };
+		BF000004 /* HermesModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000004 /* HermesModels.swift */; };
+		BF000005 /* HermesTaskService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000005 /* HermesTaskService.swift */; };
+		BF000006 /* HermesHapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000006 /* HermesHapticService.swift */; };
+		BF000007 /* HermesProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000007 /* HermesProfileService.swift */; };
+		BF000008 /* HermesSessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000008 /* HermesSessionService.swift */; };
+		BF000009 /* HermesVoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000009 /* HermesVoiceService.swift */; };
+		BF000010 /* MainScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000010 /* MainScreenView.swift */; };
+		BF000011 /* PetFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000011 /* PetFaceView.swift */; };
+		BF000012 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000012 /* ProfileView.swift */; };
+		BF000013 /* SessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000013 /* SessionView.swift */; };
+		BF000014 /* TaskQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR000014 /* TaskQueueView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FR000001 /* HermesWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesWatchApp.swift"; sourceTree = "<group>"; };
+		FR000002 /* ExtensionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExtensionDelegate.swift"; sourceTree = "<group>"; };
+		FR000003 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Config.swift"; sourceTree = "<group>"; };
+		FR000004 /* HermesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesModels.swift"; sourceTree = "<group>"; };
+		FR000005 /* HermesTaskService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesTaskService.swift"; sourceTree = "<group>"; };
+		FR000006 /* HermesHapticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesHapticService.swift"; sourceTree = "<group>"; };
+		FR000007 /* HermesProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesProfileService.swift"; sourceTree = "<group>"; };
+		FR000008 /* HermesSessionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesSessionService.swift"; sourceTree = "<group>"; };
+		FR000009 /* HermesVoiceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HermesVoiceService.swift"; sourceTree = "<group>"; };
+		FR000010 /* MainScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainScreenView.swift"; sourceTree = "<group>"; };
+		FR000011 /* PetFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PetFaceView.swift"; sourceTree = "<group>"; };
+		FR000012 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileView.swift"; sourceTree = "<group>"; };
+		FR000013 /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionView.swift"; sourceTree = "<group>"; };
+		FR000014 /* TaskQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskQueueView.swift"; sourceTree = "<group>"; };
+		FR900001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FR900002 /* HermesWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HermesWatch.entitlements; sourceTree = "<group>"; };
+		FR900003 /* HermesWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HermesWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		PHASE_FRAMEWORKS = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		GROUP_ROOT = {isa = PBXGroup; children = (GROUP_APP, GROUP_PRODUCTS); sourceTree = "<group>"; };
+		GROUP_APP = {isa = PBXGroup; children = (FR000001 /* HermesWatchApp.swift */, FR000002 /* ExtensionDelegate.swift */, FR000003 /* Config.swift */, FR000004 /* HermesModels.swift */, FR000005 /* HermesTaskService.swift */, FR000006 /* HermesHapticService.swift */, FR000007 /* HermesProfileService.swift */, FR000008 /* HermesSessionService.swift */, FR000009 /* HermesVoiceService.swift */, FR000010 /* MainScreenView.swift */, FR000011 /* PetFaceView.swift */, FR000012 /* ProfileView.swift */, FR000013 /* SessionView.swift */, FR000014 /* TaskQueueView.swift */, FR900001 /* Info.plist */, FR900002 /* HermesWatch.entitlements */); path = "HermesWatch Watch App"; sourceTree = "<group>"; };
+		GROUP_PRODUCTS = {isa = PBXGroup; children = (FR900003 /* HermesWatch.app */); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		TARGET_APP = {isa = PBXNativeTarget; buildConfigurationList = CFGLIST_APP; buildPhases = (PHASE_SOURCES, PHASE_FRAMEWORKS, PHASE_RESOURCES); buildRules = (); dependencies = (); name = HermesWatch; productName = HermesWatch; productReference = FR900003 /* HermesWatch.app */; productType = "com.apple.product-type.application"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		PROJ0001 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 2700; LastUpgradeCheck = 2700; TargetAttributes = {TARGET_APP = {CreatedOnToolsVersion = 27.0;};};}; buildConfigurationList = CFGLIST_PROJ; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = GROUP_ROOT; productRefGroup = GROUP_PRODUCTS; projectDirPath = ""; projectRoot = ""; targets = (TARGET_APP); };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		PHASE_RESOURCES = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		PHASE_SOURCES = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (BF000001 /* HermesWatchApp.swift in Sources */, BF000002 /* ExtensionDelegate.swift in Sources */, BF000003 /* Config.swift in Sources */, BF000004 /* HermesModels.swift in Sources */, BF000005 /* HermesTaskService.swift in Sources */, BF000006 /* HermesHapticService.swift in Sources */, BF000007 /* HermesProfileService.swift in Sources */, BF000008 /* HermesSessionService.swift in Sources */, BF000009 /* HermesVoiceService.swift in Sources */, BF000010 /* MainScreenView.swift in Sources */, BF000011 /* PetFaceView.swift in Sources */, BF000012 /* ProfileView.swift in Sources */, BF000013 /* SessionView.swift in Sources */, BF000014 /* TaskQueueView.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CONF_PROJ_Debug /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CLANG_ENABLE_MODULES = YES;
+			CLANG_ENABLE_OBJC_ARC = YES;
+			ENABLE_USER_SCRIPT_SANDBOXING = NO;
+			SDKROOT = watchos;
+			SWIFT_VERSION = 5.0;
+			WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			TARGETED_DEVICE_FAMILY = 4;
+			CODE_SIGN_STYLE = Automatic;
+			DEBUG_INFORMATION_FORMAT = dwarf;
+			ENABLE_TESTABILITY = YES;
+			ONLY_ACTIVE_ARCH = YES;
+			SWIFT_OPTIMIZATION_LEVEL = -Onone;
+			GCC_OPTIMIZATION_LEVEL = 0;
+}; name = Debug; };
+
+		CONF_PROJ_Release /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CLANG_ENABLE_MODULES = YES;
+			CLANG_ENABLE_OBJC_ARC = YES;
+			ENABLE_USER_SCRIPT_SANDBOXING = NO;
+			SDKROOT = watchos;
+			SWIFT_VERSION = 5.0;
+			WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			TARGETED_DEVICE_FAMILY = 4;
+			CODE_SIGN_STYLE = Automatic;
+			DEBUG_INFORMATION_FORMAT = dwarf-with-dsym;
+			ENABLE_NS_ASSERTIONS = NO;
+			SWIFT_COMPILATION_MODE = wholemodule;
+			VALIDATE_PRODUCT = YES;
+}; name = Release; };
+
+		CONF_TARGET_Debug /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {
+			CODE_SIGN_ENTITLEMENTS = "HermesWatch Watch App/HermesWatch.entitlements";
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			GENERATE_INFOPLIST_FILE = NO;
+			INFOPLIST_FILE = "HermesWatch Watch App/Info.plist";
+			LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+			MARKETING_VERSION = 1.0;
+			PRODUCT_BUNDLE_IDENTIFIER = com.example.hermes.watch;
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SDKROOT = watchos;
+			SKIP_INSTALL = NO;
+			SWIFT_EMIT_LOC_STRINGS = YES;
+			SWIFT_VERSION = 5.0;
+			TARGETED_DEVICE_FAMILY = 4;
+			WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			ENABLE_PREVIEWS = YES;
+}; name = Debug; };
+
+		CONF_TARGET_Release /* Release */ = {isa = XCBuildConfiguration; buildSettings = {
+			CODE_SIGN_ENTITLEMENTS = "HermesWatch Watch App/HermesWatch.entitlements";
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			GENERATE_INFOPLIST_FILE = NO;
+			INFOPLIST_FILE = "HermesWatch Watch App/Info.plist";
+			LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+			MARKETING_VERSION = 1.0;
+			PRODUCT_BUNDLE_IDENTIFIER = com.example.hermes.watch;
+			PRODUCT_NAME = "$(TARGET_NAME)";
+			SDKROOT = watchos;
+			SKIP_INSTALL = NO;
+			SWIFT_EMIT_LOC_STRINGS = YES;
+			SWIFT_VERSION = 5.0;
+			TARGETED_DEVICE_FAMILY = 4;
+			WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			ENABLE_PREVIEWS = YES;
+}; name = Release; };
+
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CFGLIST_PROJ = {isa = XCConfigurationList; buildConfigurations = (CONF_PROJ_Debug /* Debug */, CONF_PROJ_Release /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		CFGLIST_APP = {isa = XCConfigurationList; buildConfigurations = (CONF_TARGET_Debug /* Debug */, CONF_TARGET_Release /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = PROJ0001 /* Project object */;
+}
